@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head><title>Comptes Réceptionnistes – Hotel Master</title></head>
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title mb-0">
+                <i class="fas fa-users-cog me-2 text-primary"></i>Gestion des Comptes Réceptionnistes
+            </h2>
+            <p class="text-muted small mb-0">Créer, modifier et désactiver les comptes réceptionnistes</p>
+        </div>
+        <a th:href="@{/admin/users/nouveau}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-1"></i>Nouveau Réceptionniste
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div th:if="${#lists.isEmpty(receptionists)}" class="alert alert-info m-3">
+                <i class="fas fa-info-circle me-2"></i>
+                Aucun compte réceptionniste. Cliquez sur "Nouveau Réceptionniste" pour en créer un.
+            </div>
+            <table class="table table-hover mb-0" th:unless="${#lists.isEmpty(receptionists)}">
+                <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Nom complet</th>
+                    <th>Rôle</th>
+                    <th>Statut</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${receptionists}">
+                    <td class="text-muted small" th:text="${u.id}"></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1a2a4a,#2471a3);
+                                        color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">
+                                <i class="fas fa-user fa-xs"></i>
+                            </div>
+                            <span class="fw-semibold" th:text="${u.username}"></span>
+                        </div>
+                    </td>
+                    <td th:text="${u.nomComplet != null and !u.nomComplet.isEmpty()} ? ${u.nomComplet} : '—'"></td>
+                    <td>
+                        <span class="badge" style="background:#e8f4fd;color:#1a5276">
+                            <i class="fas fa-user-tie me-1"></i>Réceptionniste
+                        </span>
+                    </td>
+                    <td>
+                        <span th:if="${u.actif}" class="badge text-bg-success">
+                            <i class="fas fa-check-circle me-1"></i>Actif
+                        </span>
+                        <span th:unless="${u.actif}" class="badge text-bg-danger">
+                            <i class="fas fa-ban me-1"></i>Désactivé
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <!-- Modifier -->
+                        <a th:href="@{/admin/users/modifier/{id}(id=${u.id})}"
+                           class="btn btn-sm btn-outline-warning me-1" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <!-- Changer mot de passe (modal) -->
+                        <button class="btn btn-sm btn-outline-info me-1" title="Changer mot de passe"
+                                data-bs-toggle="modal"
+                                th:data-bs-target="'#pwdModal' + ${u.id}">
+                            <i class="fas fa-key"></i>
+                        </button>
+                        <!-- Supprimer -->
+                        <a th:href="@{/admin/users/supprimer/{id}(id=${u.id})}"
+                           class="btn btn-sm btn-outline-danger" title="Supprimer"
+                           th:onclick="'return confirm(\'Supprimer le compte ' + ${u.username} + ' ?\')'">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modals changement mot de passe (un par user) -->
+    <div th:each="u : ${receptionists}">
+        <div class="modal fade" th:id="'pwdModal' + ${u.id}" tabindex="-1">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-key me-2 text-info"></i>Nouveau mot de passe
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/admin/users/password/{id}(id=${u.id})}" method="post">
+                        <div class="modal-body">
+                            <p class="text-muted small mb-2">
+                                Compte : <strong th:text="${u.username}"></strong>
+                            </p>
+                            <label class="form-label fw-semibold small">Nouveau mot de passe</label>
+                            <input type="password" name="newPassword" class="form-control"
+                                   placeholder="Minimum 4 caractères" minlength="4" required/>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                                Annuler
+                            </button>
+                            <button type="submit" class="btn btn-info btn-sm text-white">
+                                <i class="fas fa-save me-1"></i>Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Connexion – Hotel Master</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a4a 0%, #243b63 50%, #1a5276 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .login-card {
+            width: 100%; max-width: 420px;
+            border: none; border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.4);
+            overflow: hidden;
+        }
+        .login-header {
+            background: linear-gradient(135deg,#1a2a4a,#2471a3);
+            padding: 2.2rem 2rem 1.5rem;
+            text-align: center; color: #fff;
+        }
+        .login-header .brand-icon {
+            font-size: 3rem; margin-bottom: .5rem;
+        }
+        .login-body { padding: 2rem; background:#fff; }
+        .form-control:focus { border-color:#2471a3; box-shadow:0 0 0 .2rem rgba(36,113,163,.25); }
+        .btn-login {
+            background: linear-gradient(135deg,#1a2a4a,#2471a3);
+            border:none; color:#fff; width:100%; padding:.75rem;
+            border-radius: 8px; font-weight:600; font-size:1rem;
+            transition: opacity .2s;
+        }
+        .btn-login:hover { opacity:.9; color:#fff; }
+        .input-group-text { background:#f8f9fa; border-right:none; }
+        .form-control { border-left:none; }
+        .demo-creds { background:#eaf4fb; border-radius:10px; padding:.9rem 1rem; font-size:.82rem; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+
+    <!-- Header -->
+    <div class="login-header">
+        <div class="brand-icon"><i class="fas fa-hotel"></i></div>
+        <h3 class="mb-0 fw-bold">Gestion Hotel</h3>
+        <p class="mb-0 opacity-75 small">Système de Gestion Hôtelière</p>
+    </div>
+
+    <!-- Body -->
+    <div class="login-body">
+
+        <!-- Alertes -->
+        <div th:if="${errorMsg}" class="alert alert-danger d-flex align-items-center gap-2 py-2 mb-3">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${errorMsg}"></span>
+        </div>
+        <div th:if="${logoutMsg}" class="alert alert-success d-flex align-items-center gap-2 py-2 mb-3">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${logoutMsg}"></span>
+        </div>
+
+        <h5 class="fw-semibold mb-4 text-center" style="color:#1a2a4a">
+            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+        </h5>
+
+        <form th:action="@{/login}" method="post">
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-muted">Identifiant</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
+                    <input type="text" name="username" class="form-control"
+                           placeholder="admin / receptionist" autofocus required/>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold small text-muted">Mot de passe</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                    <input type="password" name="password" id="pwdInput"
+                           class="form-control" placeholder="••••••••" required/>
+                    <button type="button" class="btn btn-outline-secondary border-start-0"
+                            onclick="togglePwd()" tabindex="-1">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login btn mb-3">
+                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+            </button>
+        </form>
+
+
+
+<script>
+    function togglePwd() {
+        const i = document.getElementById('pwdInput');
+        const e = document.getElementById('eyeIcon');
+        if (i.type === 'password') {
+            i.type = 'text'; e.classList.replace('fa-eye','fa-eye-slash');
+        } else {
+            i.type = 'password'; e.classList.replace('fa-eye-slash','fa-eye');
+        }
+    }
+</script>
+</body>
+</html>

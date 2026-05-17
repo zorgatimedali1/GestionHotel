@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head><title th:text="${modeEdition} ? 'Modifier Hôtel' : 'Nouvel Hôtel'">Hôtel</title></head>
+<body>
+<section>
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <a th:href="@{/hotels}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+        <h2 class="page-title mb-0"
+            th:text="${modeEdition} ? 'Modifier l\'Hôtel' : 'Ajouter un Hôtel'"></h2>
+    </div>
+
+    <div class="card shadow-sm" style="max-width:700px">
+        <div class="card-body p-4">
+            <form th:action="${modeEdition} ? @{/hotels/update} : @{/hotels/save}"
+                  method="post" enctype="multipart/form-data" th:object="${hotel}">
+
+                <input type="hidden" th:field="*{id}"/>
+                <!-- ✅ FIX IMAGE : transmet le nom de l'ancienne photo pour ne pas la perdre -->
+                <input type="hidden" th:field="*{photo}"/>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nom de l'hôtel <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" th:field="*{nom}"
+                               th:classappend="${#fields.hasErrors('nom')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{nom}"></div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Étoiles <span class="text-danger">*</span></label>
+                        <select class="form-select" th:field="*{etoiles}"
+                                th:classappend="${#fields.hasErrors('etoiles')} ? 'is-invalid'">
+                            <option value="">--</option>
+                            <option th:each="e : ${#numbers.sequence(1,5)}"
+                                    th:value="${e}" th:text="${e} + ' ★'"></option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{etoiles}"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Adresse <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" th:field="*{adresse}"
+                               th:classappend="${#fields.hasErrors('adresse')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{adresse}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ville <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" th:field="*{ville}"
+                               th:classappend="${#fields.hasErrors('ville')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{ville}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Pays <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" th:field="*{pays}"
+                               th:classappend="${#fields.hasErrors('pays')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{pays}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Téléphone</label>
+                        <input type="text" class="form-control" th:field="*{telephone}"/>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" class="form-control" th:field="*{email}"/>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Photo de l'hôtel</label>
+                        <input type="file" class="form-control" name="photoFile" accept="image/*"/>
+                        <!-- Aperçu de la photo actuelle -->
+                        <div th:if="${hotel.photo != null and !hotel.photo.isEmpty()}" class="mt-2 d-flex align-items-center gap-3">
+                            <img th:src="@{/uploads/{p}(p=${hotel.photo})}"
+                                 class="rounded shadow-sm" height="70" style="object-fit:cover;max-width:120px" alt="photo actuelle"/>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>Laissez vide pour conserver cette photo.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 pt-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>
+                            <span th:text="${modeEdition} ? 'Mettre à jour' : 'Enregistrer'"></span>
+                        </button>
+                        <a th:href="@{/hotels}" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

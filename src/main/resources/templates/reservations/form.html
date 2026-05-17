@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head><title th:text="${modeEdition} ? 'Modifier Réservation' : 'Nouvelle Réservation'">Réservation</title></head>
+<body>
+<section>
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <a th:href="@{/reservations}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+        <h2 class="page-title mb-0"
+            th:text="${modeEdition} ? 'Modifier la Réservation' : 'Nouvelle Réservation'"></h2>
+    </div>
+
+    <div class="card shadow-sm" style="max-width:720px">
+        <div class="card-body p-4">
+            <form th:action="${modeEdition} ? @{/reservations/update} : @{/reservations/save}"
+                  method="post" th:object="${reservation}">
+
+                <input type="hidden" th:field="*{id}"/>
+
+                <div class="row g-3">
+
+                    <!-- Client -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" th:field="*{nomClient}"
+                               th:classappend="${#fields.hasErrors('nomClient')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{nomClient}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" th:field="*{prenomClient}"
+                               th:classappend="${#fields.hasErrors('prenomClient')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{prenomClient}"></div>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" th:field="*{emailClient}"
+                               th:classappend="${#fields.hasErrors('emailClient')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{emailClient}"></div>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Date d'arrivée <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" th:field="*{dateArrivee}"
+                               th:classappend="${#fields.hasErrors('dateArrivee')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{dateArrivee}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Date de départ <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" th:field="*{dateDepart}"
+                               th:classappend="${#fields.hasErrors('dateDepart')} ? 'is-invalid'"/>
+                        <div class="invalid-feedback" th:errors="*{dateDepart}"></div>
+                    </div>
+
+                    <!-- Chambre -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Chambre <span class="text-danger">*</span></label>
+                        <select class="form-select" th:field="*{chambre.id}"
+                                th:classappend="${#fields.hasErrors('chambre.id')} ? 'is-invalid'">
+                            <option value="">-- Choisir une chambre --</option>
+                            <option th:each="c : ${chambres}"
+                                    th:value="${c.id}"
+                                    th:text="${c.numero} + ' – ' + ${c.type} + ' (' + ${c.prixParNuit} + ' €/nuit)'"></option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{chambre.id}"></div>
+                    </div>
+
+                    <!-- Statut -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Statut</label>
+                        <select class="form-select" th:field="*{statut}">
+                            <option th:each="s : ${statuts}" th:value="${s}" th:text="${s}"></option>
+                        </select>
+                    </div>
+
+                    <!-- MANY-TO-MANY : sélection interactive des services extra -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-concierge-bell me-1 text-info"></i>Services Extra
+                        </label>
+
+                        <div id="selectedServicesContainer" class="d-flex flex-wrap gap-2 mb-2"></div>
+
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-outline-info btn-sm dropdown-toggle" type="button" id="addServiceBtn" data-bs-toggle="dropdown">
+                                <i class="fas fa-plus me-1"></i>Ajouter un service
+                            </button>
+                            <ul class="dropdown-menu" id="servicesDropdown" aria-labelledby="addServiceBtn">
+                                <li th:each="se : ${servicesExtra}">
+                                    <a class="dropdown-item service-option"
+                                       href="#"
+                                       th:data-id="${se.id}"
+                                       th:data-nom="${se.nom}"
+                                       th:data-prix="${se.prix}"
+                                       th:text="${se.nom} + ' (+' + ${se.prix} + ' €)'"></a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <select name="servicesExtraIds" multiple class="d-none"
+                                id="servicesHiddenSelect">
+                            <option th:each="se : ${servicesExtra}"
+                                    th:value="${se.id}"
+                                    th:selected="${reservation.servicesExtra != null and reservation.servicesExtra.contains(se)}"></option>
+                        </select>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var hiddenSelect = document.getElementById('servicesHiddenSelect');
+                            var container = document.getElementById('selectedServicesContainer');
+                            var dropdown = document.getElementById('servicesDropdown');
+                            var servicesData = {};
+                            for (var item of dropdown.querySelectorAll('.service-option')) {
+                                servicesData[item.getAttribute('data-id')] = {
+                                    nom: item.getAttribute('data-nom'),
+                                    prix: item.getAttribute('data-prix')
+                                };
+                            }
+
+                            function renderChips() {
+                                container.innerHTML = '';
+                                for (var opt of hiddenSelect.options) {
+                                    if (opt.selected) {
+                                        var id = opt.value;
+                                        var data = servicesData[id] || {};
+                                        var chip = document.createElement('span');
+                                        chip.className = 'badge bg-info text-white d-inline-flex align-items-center gap-1 py-2 px-3';
+                                        chip.innerHTML = (data.nom || opt.text) + (data.prix ? ' (+' + data.prix + ' €)' : '') +
+                                            ' <a href="#" class="text-white ms-1 text-decoration-none remove-service" data-id="' + id + '" style="font-size:1.1rem">&times;</a>';
+                                        container.appendChild(chip);
+                                    }
+                                }
+                                for (var item of dropdown.querySelectorAll('.service-option')) {
+                                    var id = item.getAttribute('data-id');
+                                    var selected = false;
+                                    for (var opt of hiddenSelect.options) {
+                                        if (opt.value === id && opt.selected) {
+                                            selected = true;
+                                            break;
+                                        }
+                                    }
+                                    item.closest('li').style.display = selected ? 'none' : '';
+                                }
+                            }
+
+                            container.addEventListener('click', function (e) {
+                                if (e.target.classList.contains('remove-service')) {
+                                    e.preventDefault();
+                                    var id = e.target.getAttribute('data-id');
+                                    for (var opt of hiddenSelect.options) {
+                                        if (opt.value === id) {
+                                            opt.selected = false;
+                                            break;
+                                        }
+                                    }
+                                    renderChips();
+                                }
+                            });
+
+                            dropdown.addEventListener('click', function (e) {
+                                var item = e.target.closest('.service-option');
+                                if (item) {
+                                    e.preventDefault();
+                                    var id = item.getAttribute('data-id');
+                                    for (var opt of hiddenSelect.options) {
+                                        if (opt.value === id) {
+                                            opt.selected = true;
+                                            break;
+                                        }
+                                    }
+                                    renderChips();
+                                }
+                            });
+
+                            renderChips();
+                        });
+                    </script>
+
+                    <div class="col-12 d-flex gap-2 pt-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i>
+                            <span th:text="${modeEdition} ? 'Mettre à jour' : 'Enregistrer'"></span>
+                        </button>
+                        <a th:href="@{/reservations}" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

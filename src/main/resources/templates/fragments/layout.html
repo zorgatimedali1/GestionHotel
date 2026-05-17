@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(title, content)">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:replace="${title}">Gestion Hotel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        body { background-color: #f4f6fb; }
+        .sidebar { min-height: 100vh; background: linear-gradient(180deg,#1a2a4a 0%,#243b63 100%); }
+        .sidebar .nav-link { color: #b0bec5; border-radius: 8px; margin: 2px 8px; padding: 10px 14px; transition:.15s; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background:#ffffff22; color:#fff; }
+        .sidebar .nav-link i { width: 22px; }
+        .sidebar .brand { color:#fff; font-size:1.3rem; font-weight:700; padding:20px 16px 10px; letter-spacing:1px; }
+        .sidebar .nav-section { color:#ffffff55; font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; padding:12px 24px 4px; }
+        .card { border:none; border-radius:12px; }
+        .card-header { border-radius:12px 12px 0 0 !important; }
+        .table th { font-size:.82rem; text-transform:uppercase; letter-spacing:.5px; }
+        .page-title { font-weight:700; color:#1a2a4a; }
+        .topbar { background:#fff; border-bottom:1px solid #e9ecef; padding:.6rem 1.5rem;
+            display:flex; align-items:center; justify-content:space-between; }
+        .user-badge { background:#eaf0fb; border-radius:50px; padding:5px 14px 5px 8px;
+            display:flex; align-items:center; gap:8px; font-size:.88rem; font-weight:600; }
+        .user-avatar { width:30px; height:30px; border-radius:50%;
+            background:linear-gradient(135deg,#1a2a4a,#2471a3);
+            color:#fff; display:flex; align-items:center; justify-content:center; font-size:.8rem; }
+    </style>
+</head>
+<body>
+<div class="container-fluid p-0">
+    <div class="row g-0">
+
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-flex flex-column sidebar py-3 px-0" id="mainSidebar">
+            <div class="brand"><i class="fas fa-hotel me-2"></i>Gestion Hotel</div>
+            <hr class="border-secondary mx-3 mt-1"/>
+            <div class="nav-section">Navigation</div>
+            <ul class="nav flex-column">
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" data-path="/dashboard" th:href="@{/dashboard}">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('RECEPTIONIST')">
+                    <a class="nav-link" data-path="/receptionist" th:href="@{/receptionist/home}">
+                        <i class="fas fa-home me-2"></i>Mon Espace
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-section">Gestion</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" data-path="/hotels" th:href="@{/hotels}">
+                        <i class="fas fa-hotel me-2"></i>Hôtels
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-path="/chambres" th:href="@{/chambres}">
+                        <i class="fas fa-bed me-2"></i>Chambres
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-path="/reservations" th:href="@{/reservations}">
+                        <i class="fas fa-calendar-check me-2"></i>Réservations
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-path="/services-extra" th:href="@{/services-extra}">
+                        <i class="fas fa-concierge-bell me-2"></i>Services Extra
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-section" sec:authorize="hasRole('ADMIN')">Administration</div>
+            <ul class="nav flex-column" sec:authorize="hasRole('ADMIN')">
+                <li class="nav-item">
+                    <a class="nav-link" data-path="/admin/users" th:href="@{/admin/users}">
+                        <i class="fas fa-users-cog me-2"></i>Comptes Réceptionnistes
+                    </a>
+                </li>
+            </ul>
+            <div class="flex-grow-1"></div>
+            <div class="px-3 pb-3">
+                <hr class="border-secondary"/>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="user-avatar"><i class="fas fa-user fa-xs"></i></div>
+                    <div>
+                        <div class="text-white small fw-semibold" sec:authentication="name">user</div>
+                        <span sec:authorize="hasRole('ADMIN')" class="badge" style="background:#fde8e8;color:#c0392b;font-size:.68rem">ADMIN</span>
+                        <span sec:authorize="hasRole('RECEPTIONIST')" class="badge" style="background:#e8f4fd;color:#1a5276;font-size:.68rem">RÉCEPT.</span>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-sm btn-outline-light w-100">
+                        <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
+                    </button>
+                </form>
+            </div>
+        </nav>
+
+        <!-- Main -->
+        <main class="col-md-10 d-flex flex-column" style="min-height:100vh">
+
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-hotel text-primary"></i>
+                    <span class="fw-semibold" style="color:#1a2a4a">Gestion Hotel</span>
+                    <span class="text-muted mx-1">|</span>
+                    <small class="text-muted" id="currentDate"></small>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                <span sec:authorize="hasRole('ADMIN')" class="badge text-bg-danger">
+                    <i class="fas fa-shield-alt me-1"></i>Admin
+                </span>
+                    <span sec:authorize="hasRole('RECEPTIONIST')" class="badge text-bg-info">
+                    <i class="fas fa-user me-1"></i>Réceptionniste
+                </span>
+                    <div class="user-badge">
+                        <div class="user-avatar"><i class="fas fa-user fa-xs"></i></div>
+                        <span sec:authentication="name">user</span>
+                    </div>
+                    <form th:action="@{/logout}" method="post" class="mb-0">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Déconnexion">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Flash Alert -->
+            <div class="px-4 pt-3">
+                <div th:replace="~{partials/alert :: alert}"></div>
+            </div>
+
+            <!-- Page content -->
+            <div class="px-4 py-3 flex-grow-1">
+                <div th:replace="${content}"></div>
+            </div>
+
+            <footer class="text-center text-muted py-2" style="font-size:.75rem;border-top:1px solid #e9ecef">
+                Gestion Hotel &copy; 2026 — 4ème Année Génie Logiciel
+            </footer>
+        </main>
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Set active menu based on current URL
+    (function() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('#mainSidebar .nav-link[data-path]').forEach(link => {
+            const linkPath = link.getAttribute('data-path');
+            if (linkPath === '/dashboard') {
+                if (currentPath === '/' || currentPath === '/dashboard') {
+                    link.classList.add('active');
+                }
+            } else if (currentPath.startsWith(linkPath)) {
+                link.classList.add('active');
+            }
+        });
+    })();
+
+    document.getElementById('currentDate').textContent =
+        new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head><title>Nouveau Réceptionniste – Hotel Master</title></head>
+<body>
+<section>
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <a th:href="@{/admin/users}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+        <h2 class="page-title mb-0">
+            <i class="fas fa-user-plus me-2 text-primary"></i>Créer un compte Réceptionniste
+        </h2>
+    </div>
+
+    <div class="card shadow-sm" style="max-width:520px">
+        <div class="card-body p-4">
+            <form th:action="@{/admin/users/save}" method="post">
+                <div class="row g-3">
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Nom d'utilisateur <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
+                            <input type="text" name="username" class="form-control"
+                                   placeholder="ex: jean.dupont" minlength="3" required/>
+                        </div>
+                        <div class="form-text">Utilisé pour la connexion — doit être unique.</div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Nom complet</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-id-card text-muted"></i></span>
+                            <input type="text" name="nomComplet" class="form-control"
+                                   placeholder="ex: Jean Dupont"/>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Mot de passe <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" name="password" id="pwd" class="form-control"
+                                   placeholder="Minimum 4 caractères" minlength="4" required/>
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="togglePwd()">
+                                <i class="fas fa-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Info rôle -->
+                    <div class="col-12">
+                        <div class="alert alert-info py-2 mb-0 d-flex align-items-center gap-2">
+                            <i class="fas fa-info-circle"></i>
+                            <small>Ce compte sera créé avec le rôle <strong>Réceptionniste</strong> automatiquement.</small>
+                        </div>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 pt-1">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-1"></i>Créer le compte
+                        </button>
+                        <a th:href="@{/admin/users}" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+<script>
+function togglePwd() {
+    const i = document.getElementById('pwd');
+    const e = document.getElementById('eyeIcon');
+    i.type = i.type === 'password' ? 'text' : 'password';
+    e.classList.toggle('fa-eye'); e.classList.toggle('fa-eye-slash');
+}
+</script>
+</body>
+</html>

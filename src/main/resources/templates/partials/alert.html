@@ -1,0 +1,28 @@
+<!--
+    Fragment d'alerte Bootstrap à insérer dans le layout.
+    S'affiche automatiquement si les flashAttributes "alertMsg" sont présents.
+    Se ferme automatiquement après 4 secondes.
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="alert">
+    <div th:if="${alertMsg}"
+         th:classappend="'alert alert-' + ${alertType} + ' alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm'"
+         role="alert" id="flashAlert">
+        <i th:classappend="'fas ' + ${alertIcon}"></i>
+        <span th:text="${alertMsg}"></span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+    <script th:if="${alertMsg}">
+        setTimeout(() => {
+            const el = document.getElementById('flashAlert');
+            if (el) {
+                el.classList.remove('show');
+                setTimeout(() => el.remove(), 300);
+            }
+        }, 4000);
+    </script>
+</div>
+</body>
+</html>

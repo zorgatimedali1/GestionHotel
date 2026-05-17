@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head><title>Modifier Compte – Hotel Master</title></head>
+<body>
+<section>
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <a th:href="@{/admin/users}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+        <h2 class="page-title mb-0">
+            <i class="fas fa-user-edit me-2 text-warning"></i>
+            Modifier le compte — <span th:text="${user.username}"></span>
+        </h2>
+    </div>
+
+    <div class="card shadow-sm" style="max-width:520px">
+        <div class="card-body p-4">
+            <form th:action="@{/admin/users/update}" method="post" th:object="${user}">
+                <input type="hidden" name="id" th:value="${user.id}"/>
+
+                <div class="row g-3">
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Nom d'utilisateur <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
+                            <input type="text" name="username" class="form-control"
+                                   th:value="${user.username}" minlength="3" required/>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Nom complet</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-id-card text-muted"></i></span>
+                            <input type="text" name="nomComplet" class="form-control"
+                                   th:value="${user.nomComplet}"/>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Statut du compte</label>
+                        <div class="form-check form-switch pt-1">
+                            <input class="form-check-input" type="checkbox" name="actif"
+                                   th:checked="${user.actif}" role="switch" id="actifSwitch"/>
+                            <label class="form-check-label" for="actifSwitch">
+                                <span th:if="${user.actif}" class="text-success fw-semibold">
+                                    <i class="fas fa-check-circle me-1"></i>Compte actif
+                                </span>
+                                <span th:unless="${user.actif}" class="text-danger fw-semibold">
+                                    <i class="fas fa-ban me-1"></i>Compte désactivé
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-text">Un compte désactivé ne peut plus se connecter.</div>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 pt-1">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-1"></i>Enregistrer
+                        </button>
+                        <a th:href="@{/admin/users}" class="btn btn-outline-secondary">Annuler</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

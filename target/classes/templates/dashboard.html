@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head><title>Dashboard – Hotel Master</title></head>
+<body>
+<section>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title mb-0"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Tableau de Bord</h2>
+            <p class="text-muted small mb-0">Vue d'ensemble de votre établissement hôtelier</p>
+        </div>
+        <div sec:authorize="hasRole('ADMIN')" class="d-flex gap-2">
+            <a th:href="@{/hotels/nouveau}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>Hôtel
+            </a>
+            <a th:href="@{/chambres/nouveau}" class="btn btn-info btn-sm text-white">
+                <i class="fas fa-plus me-1"></i>Chambre
+            </a>
+            <a th:href="@{/reservations/nouveau}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus me-1"></i>Réservation
+            </a>
+        </div>
+    </div>
+
+    <!-- ── Ligne 1 : Hôtels & Chambres ─────────────────────────────────────── -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100 border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1 text-uppercase fw-semibold">Total Hôtels</p>
+                            <h2 class="fw-bold mb-0" th:text="${stats.totalHotels}">0</h2>
+                            <small class="text-muted">établissements enregistrés</small>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                            <i class="fas fa-hotel fa-xl text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a th:href="@{/hotels}" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-eye me-1"></i>Voir les hôtels
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100 border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1 text-uppercase fw-semibold">Total Chambres</p>
+                            <h2 class="fw-bold mb-0" th:text="${stats.totalChambres}">0</h2>
+                            <small class="text-muted">toutes catégories</small>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                            <i class="fas fa-bed fa-xl text-info"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a th:href="@{/chambres}" class="btn btn-info btn-sm w-100 text-white">
+                            <i class="fas fa-eye me-1"></i>Voir les chambres
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100 border-start border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1 text-uppercase fw-semibold">Disponibles</p>
+                            <h2 class="fw-bold mb-0 text-success" th:text="${stats.chambresDisponibles}">0</h2>
+                            <small class="text-muted">chambres libres</small>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                            <i class="fas fa-check-circle fa-xl text-success"></i>
+                        </div>
+                    </div>
+                    <!-- Barre de disponibilité -->
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">Occupées</small>
+                            <small class="fw-semibold" th:text="${stats.tauxOccupation} + '%'">0%</small>
+                        </div>
+                        <div class="progress" style="height:6px">
+                            <div class="progress-bar bg-danger"
+                                 th:style="'width:' + ${stats.tauxOccupation} + '%'"
+                                 role="progressbar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100 border-start border-danger border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1 text-uppercase fw-semibold">Occupées</p>
+                            <h2 class="fw-bold mb-0 text-danger" th:text="${stats.chambresOccupees}">0</h2>
+                            <small class="text-muted">chambres indisponibles</small>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 rounded-3 p-3">
+                            <i class="fas fa-door-closed fa-xl text-danger"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">Prix moyen / nuit</small>
+                            <small class="fw-semibold text-primary"
+                                   th:text="${#numbers.formatDecimal(stats.prixMoyenChambre,1,2)} + ' €'">0 €</small>
+                        </div>
+                        <div class="progress" style="height:6px">
+                            <div class="progress-bar bg-primary" style="width:100%" role="progressbar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Ligne 2 : Réservations ────────────────────────────────────────────── -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                        <i class="fas fa-calendar-alt fa-xl text-warning"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold">Réservations</p>
+                        <h3 class="fw-bold mb-0" th:text="${stats.totalReservations}">0</h3>
+                        <small class="text-muted">total historique</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                        <i class="fas fa-thumbs-up fa-xl text-success"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold">Confirmées</p>
+                        <h3 class="fw-bold mb-0 text-success" th:text="${stats.reservationsConfirmees}">0</h3>
+                        <small class="text-muted">réservations actives</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                        <i class="fas fa-clock fa-xl text-warning"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold">En Attente</p>
+                        <h3 class="fw-bold mb-0 text-warning" th:text="${stats.reservationsEnAttente}">0</h3>
+                        <small class="text-muted">à traiter</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-10 rounded-3 p-3">
+                        <i class="fas fa-ban fa-xl text-danger"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold">Annulées</p>
+                        <h3 class="fw-bold mb-0 text-danger" th:text="${stats.reservationsAnnulees}">0</h3>
+                        <small class="text-muted">réservations perdues</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Ligne 3 : Finance + Taux + Accès Rapide ───────────────────────────── -->
+    <div class="row g-3 mb-3">
+
+        <!-- ✅ CA confirmé — visible ADMIN uniquement -->
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
+            <div class="card shadow-sm h-100" style="background:linear-gradient(135deg,#1a2a4a,#2471a3)">
+                <div class="card-body text-white">
+                    <p class="opacity-75 small text-uppercase fw-semibold mb-1">
+                        <i class="fas fa-euro-sign me-1"></i>Chiffre d'Affaires
+                    </p>
+                    <h2 class="fw-bold mb-1"
+                        th:text="${#numbers.formatDecimal(stats.chiffreAffaires,1,2)} + ' €'">0 €</h2>
+                    <small class="opacity-75">Réservations CONFIRMÉES uniquement</small>
+                    <hr class="border-white opacity-25"/>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="opacity-75 small">CA Potentiel (en attente)</span>
+                        <span class="badge bg-warning text-dark fw-semibold"
+                              th:text="${#numbers.formatDecimal(stats.chiffreAffairesPotentiel,1,2)} + ' €'">0 €</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Taux d'occupation visuel -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold border-bottom-0 pb-0">
+                    <i class="fas fa-chart-pie me-2 text-primary"></i>Taux d'Occupation
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-4">
+                        <!-- Cercle SVG simple -->
+                        <div style="position:relative;width:90px;height:90px;flex-shrink:0">
+                            <svg viewBox="0 0 36 36" style="transform:rotate(-90deg);width:90px;height:90px">
+                                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e9ecef" stroke-width="3"/>
+                                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#dc3545" stroke-width="3"
+                                        stroke-dasharray="100" stroke-linecap="round"
+                                        th:attr="stroke-dasharray=${stats.tauxOccupation} + ' 100'"/>
+                            </svg>
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+                                <span class="fw-bold text-danger" style="font-size:.9rem"
+                                      th:text="${stats.tauxOccupation} + '%'">0%</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="mb-2">
+                                <span class="badge text-bg-danger me-1" th:text="${stats.chambresOccupees}"></span>
+                                <small class="text-muted">occupées</small>
+                            </div>
+                            <div>
+                                <span class="badge text-bg-success me-1" th:text="${stats.chambresDisponibles}"></span>
+                                <small class="text-muted">disponibles</small>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Prix moyen :</small>
+                                <span class="fw-semibold text-primary ms-1"
+                                      th:text="${#numbers.formatDecimal(stats.prixMoyenChambre,1,2)} + ' €'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statuts réservations + services -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white fw-semibold border-bottom-0 pb-0">
+                    <i class="fas fa-chart-bar me-2 text-success"></i>Statuts Réservations
+                </div>
+                <div class="card-body">
+                    <!-- Barre confirmées -->
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-semibold text-success">Confirmées</small>
+                            <small th:text="${stats.reservationsConfirmees}">0</small>
+                        </div>
+                        <div class="progress" style="height:8px">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 th:style="'width:' + (${stats.totalReservations} > 0 ? ${stats.reservationsConfirmees} * 100 / ${stats.totalReservations} : 0) + '%'"></div>
+                        </div>
+                    </div>
+                    <!-- Barre en attente -->
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-semibold text-warning">En attente</small>
+                            <small th:text="${stats.reservationsEnAttente}">0</small>
+                        </div>
+                        <div class="progress" style="height:8px">
+                            <div class="progress-bar bg-warning" role="progressbar"
+                                 th:style="'width:' + (${stats.totalReservations} > 0 ? ${stats.reservationsEnAttente} * 100 / ${stats.totalReservations} : 0) + '%'"></div>
+                        </div>
+                    </div>
+                    <!-- Barre annulées -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-semibold text-danger">Annulées</small>
+                            <small th:text="${stats.reservationsAnnulees}">0</small>
+                        </div>
+                        <div class="progress" style="height:8px">
+                            <div class="progress-bar bg-danger" role="progressbar"
+                                 th:style="'width:' + (${stats.totalReservations} > 0 ? ${stats.reservationsAnnulees} * 100 / ${stats.totalReservations} : 0) + '%'"></div>
+                        </div>
+                    </div>
+                    <hr class="my-2"/>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-concierge-bell text-secondary"></i>
+                        <small class="text-muted">Services Extra disponibles :</small>
+                        <span class="badge text-bg-secondary fw-bold" th:text="${stats.totalServicesExtra}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Ligne 4 : Accès Rapide (ADMIN seulement) ───────────────────────────── -->
+    <div class="row g-3" sec:authorize="hasRole('ADMIN')">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="fas fa-bolt me-2 text-warning"></i>Accès Rapide
+                    <span class="badge text-bg-danger ms-2 small">ADMIN</span>
+                </div>
+                <div class="card-body d-flex flex-wrap gap-3">
+                    <a th:href="@{/hotels/nouveau}" class="btn btn-outline-primary">
+                        <i class="fas fa-hotel me-2"></i>Nouvel Hôtel
+                    </a>
+                    <a th:href="@{/chambres/nouveau}" class="btn btn-outline-info">
+                        <i class="fas fa-bed me-2"></i>Nouvelle Chambre
+                    </a>
+                    <a th:href="@{/reservations/nouveau}" class="btn btn-outline-success">
+                        <i class="fas fa-calendar-plus me-2"></i>Nouvelle Réservation
+                    </a>
+                    <a th:href="@{/services-extra/nouveau}" class="btn btn-outline-secondary">
+                        <i class="fas fa-concierge-bell me-2"></i>Nouveau Service
+                    </a>
+                    <a th:href="@{/reservations(mc='',page=0)}" class="btn btn-outline-warning">
+                        <i class="fas fa-clock me-2"></i>Voir les En Attente
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>
