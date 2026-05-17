@@ -302,5 +302,6 @@ apache-tomcat-9.0.115/logs/catalina.out
 | **Tomcat externe** (WAR) | `http://localhost:8080/HotelMaster` |
 | **Maven intégré** (`mvn spring-boot:run`) | `http://localhost:8080` |
 | **IntelliJ Run** | `http://localhost:8080` |
-#   G e s t i o n H o t e l  
+#   G e s t i o n H o t e l 
+ 
  
